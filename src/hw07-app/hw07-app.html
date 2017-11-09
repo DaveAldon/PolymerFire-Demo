@@ -6,13 +6,26 @@
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+
 
 <dom-module id="hw07-app">
   <template>
-  <style>
+  <style include="iron-flex iron-flex-alignment">
     iron-list {
       width: 60%;
       height: 50%;
+    }
+    paper-card {
+      width: 100%;
+      background-color: lightblue;
+    }
+    .card-content {
+      margin-top: -10px;
+    }
+    #card-holder {
+      padding: 5px;
     }
   </style>
   <firebase-app id="myFireApp" auth-domain="json-homework-4.firebaseapp.com"
@@ -23,11 +36,24 @@
   <firebase-query path="/users" data="{{qryData}}"></firebase-query>
 
   <iron-list items="[[qryData]]" as="ord">
-<template>
-     <div>
-       <li>[[ord.name]]</li>
+    <template>
+     <div id=card-holder>
+      <paper-card heading="[[ord.name]]">
+        <div class="layout horizontal">
+          <div class="layout vertical">
+            <div class="card-content"><h3>Age: [[ord.age]]</h3></div>
+            <div class="card-content"><h3>Phone Number: [[ord.phone]]</h3></div>
+          </div>
+          <div class="card-actions">
+            <paper-button>Ok</paper-button>
+            <paper-button>Delete</paper-button>
+          </div>
+        </div>
+      </paper-card>
      </div>
-   </template>
+
+
+    </template>
 
   </iron-list>
 
