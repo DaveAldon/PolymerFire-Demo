@@ -9,9 +9,8 @@
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 
-
 <dom-module id="hw07-app">
-  <template>
+  <template is="dom-bind">
   <style include="iron-flex iron-flex-alignment">
     iron-list {
       width: 60%;
@@ -23,6 +22,7 @@
     }
     .card-content {
       margin-top: -10px;
+      margin-left: 10px;
     }
     #card-holder {
       padding: 5px;
@@ -34,6 +34,15 @@
     messaging-sender-id="365368634575">
   </firebase-app>
   <firebase-query path="/users" data="{{qryData}}"></firebase-query>
+  <paper-button raised on-click="toggleadd">Add Friend</paper-button>
+
+  <paper-dialog id="newFriend" modal on-iron-overlay-closed="diaClosed">
+    <!-- Complete the UI design of your dialog here -->
+    <div class="buttons">
+      <paper-button dialog-dismiss>Cancel</paper-button>
+      <paper-button dialog-confirm>Add</paper-button>
+    </div>
+  </paper-dialog>
 
   <iron-list items="[[qryData]]" as="ord">
     <template>
@@ -45,16 +54,11 @@
             <div class="card-content"><h3>Phone Number: [[ord.phone]]</h3></div>
           </div>
           <div class="card-actions">
-            <paper-button>Ok</paper-button>
-            <paper-button>Delete</paper-button>
           </div>
         </div>
       </paper-card>
      </div>
-
-
     </template>
-
   </iron-list>
 
 </template>
@@ -63,6 +67,7 @@
      * @customElement
      * @polymer
      */
+
     class Hw07App extends Polymer.Element {
       static get is() { return 'hw07-app'; }
       static get properties() {
@@ -73,7 +78,25 @@
           }
         };
       }
+      ready() {
+        super.ready();
+      }
+      toggleadd() {
+        this.$.newFriend.open();
+      }
+      diaClosed() {
+        if (this.$.newFriend.closingReason.confirmed) {
+          var dbRef = this.$.myFireApp.app.database();
+          dbRef.ref('/users').push().set({
+            name: 'HEY',
+            phone: '3333333',
+            age : '44'
+          });
+          //     dbRef.ref('____').push().update(____);
+        }
+      }
     }
+
 
     window.customElements.define(Hw07App.is, Hw07App);
   </script>
