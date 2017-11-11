@@ -8,6 +8,11 @@
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/neon-animation/web-animations.html">
+<link rel="import" href="../../bower_components/neon-animation/animations/slide-from-left-animation.html">
+<link rel="import" href="../../bower_components/neon-animation/animations/slide-right-animation.html">
 
 <dom-module id="hw07-app">
   <template is="dom-bind">
@@ -27,33 +32,54 @@
     #card-holder {
       padding: 5px;
     }
+    #addfriendbtn {
+      width: 59.3%;
+    }
+    #delitembtn {
+      background-color: salmon;
+      height: 63%;
+      right: -5px;
+      position: absolute;
+    }
+    #cardinfo {
+      background-color: lightgreen;
+    }
   </style>
+
   <firebase-app id="myFireApp" auth-domain="json-homework-4.firebaseapp.com"
     database-url="https://json-homework-4.firebaseio.com"
     api-key="AIzaSyBpUYA2lX51fEKjHqkKIajJVVAY5cUIcOg"
     messaging-sender-id="365368634575">
   </firebase-app>
   <firebase-query path="/users" data="{{qryData}}"></firebase-query>
-  <paper-button raised on-click="toggleadd">Add Friend</paper-button>
 
-  <paper-dialog id="newFriend" modal on-iron-overlay-closed="diaClosed">
-    <!-- Complete the UI design of your dialog here -->
+  <paper-button id="addfriendbtn" raised on-click="toggleadd">Add Friend</paper-button>
+
+  <paper-dialog id="newFriend" entry-animation="slide-from-left-animation" exit-animation="slide-right-animation" modal on-iron-overlay-closed="diaClosed">
     <div class="buttons">
-      <paper-button dialog-dismiss>Cancel</paper-button>
+      <div class="layout vertical">
+        <paper-input id="inName" label="Name"></paper-input>
+        <paper-input auto-validate allowed-pattern="[0-9]" id="inPhone" label="Phone Number"></paper-input>
+        <paper-input auto-validate allowed-pattern="[0-9]" id="inAge" label="Age"></paper-input>
+      </div>
       <paper-button dialog-confirm>Add</paper-button>
+      <paper-button dialog-dismiss>Cancel</paper-button>
     </div>
   </paper-dialog>
 
   <iron-list items="[[qryData]]" as="ord">
     <template>
-     <div id=card-holder>
+     <div id="card-holder">
       <paper-card heading="[[ord.name]]">
-        <div class="layout horizontal">
+        <div id="cardinfo" class="layout horizontal">
           <div class="layout vertical">
             <div class="card-content"><h3>Age: [[ord.age]]</h3></div>
             <div class="card-content"><h3>Phone Number: [[ord.phone]]</h3></div>
           </div>
           <div class="card-actions">
+            <paper-button id="delitembtn" on-click="toggledel">
+              <iron-icon icon="icons:delete"></iron-icon>
+            Delete</paper-button>
           </div>
         </div>
       </paper-card>
@@ -67,6 +93,7 @@
      * @customElement
      * @polymer
      */
+
 
     class Hw07App extends Polymer.Element {
       static get is() { return 'hw07-app'; }
@@ -84,19 +111,25 @@
       toggleadd() {
         this.$.newFriend.open();
       }
+      toggledel(ev) {
+        var dbRef = this.$.myFireApp.app.database();
+        dbRef.ref('/users/' + ev.model.ord.$key + '/').update({
+          name: null,
+          phone: null,
+          age : null
+        });
+      }
       diaClosed() {
         if (this.$.newFriend.closingReason.confirmed) {
           var dbRef = this.$.myFireApp.app.database();
           dbRef.ref('/users').push().set({
-            name: 'HEY',
-            phone: '3333333',
-            age : '44'
+            name: this.$.inName.value,
+            phone: this.$.inPhone.value,
+            age : this.$.inAge.value
           });
-          //     dbRef.ref('____').push().update(____);
         }
       }
     }
-
 
     window.customElements.define(Hw07App.is, Hw07App);
   </script>
